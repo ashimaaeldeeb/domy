@@ -13,22 +13,22 @@ const productSchema = new mongoose.Schema({
         required: true
     },
     details: {
-        brand: {
+        Brand: {
             type: String
         },
-        processor: {
+        Processor: {
             type: String
         },
-        ram: {
+        RAM: {
             type: String
         },
-        hardDisk: {
+        HardDisk: {
             type: String
         },
-        graphicsCard: {
+        GPU: {
             type: String
         },
-        color: {
+        Color: {
             type: String
         }
     },

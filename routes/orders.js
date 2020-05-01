@@ -8,6 +8,14 @@ const CheckToken = require('../midlware/Auth');
 const validateObjectId = require('../helpers/ValidateObjectId');
 const router = express.Router();
 
+
+//view admin orders
+router.get('/', async (req, res) => {
+    const orders = await Order.find({});
+    if (!orders) return res.status(404).send('No orders found');
+    res.send(orders);
+});
+
 //view user orders
 router.get('/user/:id', CheckToken, async (req, res) => {
     const id = req.params.id;
@@ -18,9 +26,6 @@ router.get('/user/:id', CheckToken, async (req, res) => {
         return res.status(400).send("Invalid ID");
     }
     const orders = await Order.find({
-        isCancelled: {
-            $ne: true
-        },
         user: id
     });
     if (!orders) {
@@ -56,12 +61,12 @@ router.post('/', CheckToken, async (req, res) => {
         status: "pending"
     });
     cart.productsList.forEach(async element => {
-        if (!element.isDeleted) {
+        // if (!element.isDeleted) {
             productsToBeOrdered.push(element);
             const product = await Product.findById(element.productId)
             totalPrice += (product.price) * element.quantity;
             order.price = totalPrice;
-        }
+        // }
     });
     order.products = productsToBeOrdered;
     order.save()
@@ -94,6 +99,9 @@ router.patch('/:id', CheckToken, async (req, res) => {
                 return res.status(400).send(`run out of stock product ${element}`);
             }
             product.quantity -= element.quantity;
+            if(product.quantity<0){
+                product.quantity=0;
+            }
             await product.save();
         })
     }
