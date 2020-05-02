@@ -7,7 +7,7 @@ const userSchema = Joi.object({
     email: Joi.string().email().required(),
     image: Joi.string(),
     gender: Joi.string().valid('female', 'male'),
-    isAdmin: Joi.boolean(),
+    isAdmin: Joi.boolean().default(false),
     orders: Joi.array().items(Joi.objectId()).default([]),
     cart: Joi.objectId()
     // orders: Joi.array().items(Joi.objectId()).default([]),

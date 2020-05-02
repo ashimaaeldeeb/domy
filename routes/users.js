@@ -28,7 +28,8 @@ router.post('/signup', async (req, res) => {
             userName,
             password,
             gender,
-            isAdmin
+            isAdmin,
+            image
         } = req.body;
 
         const userExists = await User.findOne({
@@ -43,7 +44,7 @@ router.post('/signup', async (req, res) => {
             gender,
             isAdmin,
             password,
-
+            image
         });
 
         let cart = new Cart({
@@ -57,7 +58,9 @@ router.post('/signup', async (req, res) => {
         await cart.save();
         const payload = {
             user: {
-                id: user._id
+                id: user._id,
+                userName: user.userName,
+                isAdmin: user.isAdmin
             }
         };
         jwt.sign(payload, "secret", {
@@ -105,6 +108,8 @@ router.post('/login', async (req, res) => {
         const payload = {
             user: {
                 id: user._id,
+                userName: user.userName,
+                isAdmin: user.isAdmin
             }
         }
         jwt.sign(payload, "secret", {
