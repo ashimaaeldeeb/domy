@@ -17,6 +17,7 @@ router.get('/', async (req, res) => {
     res.send(products);
 });
 
+//TODO : check which search???
 //search for product  
 router.post('/search', async (req, res) => {
     const searchparams = {
@@ -24,7 +25,11 @@ router.post('/search', async (req, res) => {
     }
     if (searchparams.title) {
         await Product.find({
-            title: new RegExp(".*" + searchparams.title + ".*")
+            $and: [{
+                title: new RegExp(".*" + searchparams.title + ".*") //TODO : case sensitive???
+            }, {
+                isDeleted: { $ne: true}
+            }]
         }, (error, result) => {
             if (error) {
                 return res.send(error)
@@ -34,7 +39,41 @@ router.post('/search', async (req, res) => {
             return res.send(result)
         })
     }
+    else{
+        return res.status(404).send("No title found")
+    }
 });
+
+//   /search/Brand?Brand=Lenovo 
+//   /search/Brand?Brand=HP
+//   /search/Brand?Brand=Dell
+router.get('/search/Brand', async (req, res) => {
+    console.log("hi2");
+    console.log("Requset "+req.url);
+    const queryObject = url.parse(req.url,true).search;
+    console.log(req.query);
+    console.log(queryObject);
+    console.log(queryObject[0]);
+    console.log(queryObject.Brand);
+    console.log(queryObject["Brand"]);
+    //const products = await Product.find({"title":{ $regex:req.query.title}},{"isDeleted": false});
+    const products = await Product.find({"details.Brand":req.query.Brand},{"isDeleted": false});
+    console.log(req.originalUrl);
+    //console.log(products)
+    if (!products) return res.status(404).send('Product not found');
+    res.send(products);
+});
+
+//   /search/Processor?Processor=Core i3 
+//   /search/Processor?Processor=Core i5
+//   /search/Processor?Processor=Core i7
+//   /search/Processor?Processor=Core i9
+router.get('/search/Processor', async (req, res) => {
+    const products = await Product.find({"details.Processor":req.query.Processor},{"isDeleted": false});
+    if (!products) return res.status(404).send('Product not found');
+    res.send(products);
+});
+
 
 //get promoted products only
 router.get('/promoted', async (req, res) => {
@@ -90,8 +129,8 @@ router.delete('/:id', async (req, res) => {
     });
     if (!product)
         return res.status(404).send('Product not found');
-    const deleltedPrpduct = await Product.findById(id);
-    res.send(deleltedPrpduct);
+    const deleltedProduct = await Product.findById(id);
+    res.send(deleltedProduct);
 });
 
 //edit product 
@@ -120,12 +159,12 @@ router.patch('/:id', upload.array('images', 5), async (req, res) => {
     if (!product.details) {
         productFromDB.details = productFromDB.details;
     } else {
-        productFromDB.details.brand = product.details.brand ? product.details.brand : productFromDB.details.brand;
-        productFromDB.details.processor = product.details.processor ? product.details.processor : productFromDB.details.processor;
-        productFromDB.details.ram = product.details.ram ? product.details.ram : productFromDB.details.ram;
-        productFromDB.details.hardDisk = product.details.hardDisk ? product.details.hardDisk : productFromDB.details.hardDisk;
-        productFromDB.details.graphicsCard = product.details.graphicsCard ? product.details.graphicsCard : productFromDB.details.graphicsCard;
-        productFromDB.details.color = product.details.color ? product.details.color : productFromDB.details.color;
+        productFromDB.details.Brand = product.details.Brand ? product.details.Brand : productFromDB.details.Brand;
+        productFromDB.details.Processor = product.details.Processor ? product.details.Processor : productFromDB.details.Processor;
+        productFromDB.details.RAM = product.details.RAM ? product.details.RAM : productFromDB.details.RAM;
+        productFromDB.details.HardDisk = product.details.HardDisk ? product.details.HardDisk : productFromDB.details.HardDisk;
+        productFromDB.details.GPU = product.details.GPU ? product.details.GPU : productFromDB.details.GPU;
+        productFromDB.details.Color = product.details.Color ? product.details.Color : productFromDB.details.Color;
     }
     if (req.files) {
         let images = [];

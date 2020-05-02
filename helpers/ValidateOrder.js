@@ -9,7 +9,6 @@ const orderSchema = Joi.object({
     products: Joi.array().items(Joi.object({
         productId: Joi.objectId().optional(),
         quantity: Joi.number().optional(),
-        isDeleted: Joi.boolean().optional().default(false)
     })).default([]),
     status: Joi.string().valid('cancelled', 'pending', 'accepted', 'rejected').required().default('pending'),
     isCancelled: Joi.boolean().optional().default(false)
