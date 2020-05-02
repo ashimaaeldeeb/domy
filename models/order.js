@@ -11,7 +11,7 @@ const orderSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        required: true
+        // required: true
     },
     products: [{
         product: {

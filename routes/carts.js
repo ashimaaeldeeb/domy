@@ -141,7 +141,7 @@ router.patch(
 //Delete a product is user's cart
 router.delete(
   "/user/:id/product/:productId",
-  [CheckToken, validateCart],
+  [CheckToken],
   async (req, res) => {
     const { error } = validateObjectId(req.params.id);
     if (error) return res.status(400).send("User id is not valid");
@@ -182,7 +182,7 @@ router.delete(
 //Checkout => Empty Cart
 router.get(
   "/user/:id/checkout",
-  [CheckToken, validateCart],
+  [CheckToken],
   async (req, res) => {
     const { id } = req.params;
     const { error } = validateObjectId(req.params.id);

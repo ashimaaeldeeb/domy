@@ -5,7 +5,7 @@ Joi.objectId = require('joi-objectid')(Joi);
 const orderSchema = Joi.object({
     user: Joi.objectId().required(),
     date: Joi.date().optional(),
-    price: Joi.number().default(0),
+    price: Joi.number(),
     products: Joi.array().items(Joi.object({
         productId: Joi.objectId().optional(),
         quantity: Joi.number().optional(),

@@ -51,25 +51,37 @@ router.post('/', CheckToken, async (req, res) => {
     const cart = await Cart.findById(user.cart);
     if (!cart.productsList.length)
         return res.status(400).send("cart is empty");
-    let productsToBeOrdered = [];
+    // let productsToBeOrdered = [];
     var totalPrice = 0;
     let order = new Order({
         user: req.body.user,
         date: Date.now(),
-        price: totalPrice,
-        products: productsToBeOrdered,
+        price: 0,
+        products: [],
         status: "pending"
     });
     cart.productsList.forEach(async element => {
         // if (!element.isDeleted) {
-            productsToBeOrdered.push(element);
+            order.products.push({
+                product: element.productId,
+                quantity: element.quantity,
+            });
             const product = await Product.findById(element.productId)
+            console.log("product")
+            console.log(product)
             totalPrice += (product.price) * element.quantity;
+            console.log("totalPrice")
+            console.log(totalPrice)
             order.price = totalPrice;
+            console.log("order")
+            console.log(order)
+
         // }
     });
-    order.products = productsToBeOrdered;
-    order.save()
+    // order.products = productsToBeOrdered;
+    await order.save()
+    console.log("order2")
+    console.log(order)
     user.orders.push(order.id);
     await user.save();
     cart.productsList = [];
