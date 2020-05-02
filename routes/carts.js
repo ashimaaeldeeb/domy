@@ -38,6 +38,7 @@ router.post("/user/:id", [CheckToken, validateCart], async (req, res) => {
   const indexFound = userCart.productsList.findIndex(item => {
     return item.productId == req.body.productsList[0].productId;
   });
+  // console.log("henaaa", product.quantity - req.body.productsList[0].quantity >= 0);
 
   if (indexFound !== -1 && product.quantity >= 0) {
     //here
@@ -53,6 +54,7 @@ router.post("/user/:id", [CheckToken, validateCart], async (req, res) => {
     }
   } else if (product.quantity > 0) {
     //not in cart yet
+    console.log("henaaa", product.quantity - req.body.productsList[0].quantity >= 0);
     if (product.quantity - req.body.productsList[0].quantity >= 0) {
       userCart.productsList.push({
         productId: req.body.productsList[0].productId,
@@ -63,6 +65,10 @@ router.post("/user/:id", [CheckToken, validateCart], async (req, res) => {
       //products < desired qty
       return res.status(400).send("More than available quantity");
     }
+  }
+  else{
+    return res.status(400).send("More than available quantity");
+
   }
 
   await userCart.save();
@@ -96,48 +102,48 @@ router.post("/user/:id", [CheckToken, validateCart], async (req, res) => {
   //return res.status(200).send(cart);
 });
 
-//Patch user's cart
-router.patch(
-  "/user/:id/product",
-  [CheckToken, validateCart],
-  async (req, res) => {
-    const id = req.params.id;
-    const { error } = validateObjectId(id);
-    if (error) return res.status(400).send("User id is not valid");
-    const user = await User.findById(id);
-    if (!user) return res.status(404).send("User is not found");
+// //Patch user's cart
+// router.patch(
+//   "/user/:id/product",
+//   [CheckToken, validateCart],
+//   async (req, res) => {
+//     const id = req.params.id;
+//     const { error } = validateObjectId(id);
+//     if (error) return res.status(400).send("User id is not valid");
+//     const user = await User.findById(id);
+//     if (!user) return res.status(404).send("User is not found");
 
-    const cart = await Cart.findOne({
-      userId: id
-    });
-    if (!cart) return res.status(400).send("User's cart is not found");
-    const productModified = {
-      productId: req.body.productId,
-      quantity: req.body.quantity
-      // isDeleted: req.body.isDeleted
-    };
-    const productInStore = await Product.findById(productModified.productId);
-    if (
-      productModified.quantity &&
-      productModified.quantity > productInStore.quantity
-    )
-      return res.status(400).send("More than available quantity");
+//     const cart = await Cart.findOne({
+//       userId: id
+//     });
+//     if (!cart) return res.status(400).send("User's cart is not found");
+//     const productModified = {
+//       productId: req.body.productId,
+//       quantity: req.body.quantity
+//       // isDeleted: req.body.isDeleted
+//     };
+//     const productInStore = await Product.findById(productModified.productId);
+//     if (
+//       productModified.quantity &&
+//       productModified.quantity > productInStore.quantity
+//     )
+//       return res.status(400).send("More than available quantity");
 
-    cart.productsList.forEach(element => {
-      if (element.productId == productModified.productId) {
-        element.quantity = productModified.quantity
-          ? productModified.quantity
-          : element.quantity;
-        //   element.isDeleted = productModified.isDeleted
-        //     ? productModified.isDeleted
-        //     : element.isDeleted;
-      }
-    });
+//     cart.productsList.forEach(element => {
+//       if (element.productId == productModified.productId) {
+//         element.quantity = productModified.quantity
+//           ? productModified.quantity
+//           : element.quantity;
+//         //   element.isDeleted = productModified.isDeleted
+//         //     ? productModified.isDeleted
+//         //     : element.isDeleted;
+//       }
+//     });
 
-    await cart.save();
-    res.status(200).send(cart);
-  }
-);
+//     await cart.save();
+//     res.status(200).send(cart);
+//   }
+// );
 //Delete a product is user's cart
 router.delete(
   "/user/:id/product/:productId",
