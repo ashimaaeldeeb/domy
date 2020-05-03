@@ -20,7 +20,7 @@ mongoose.connect('mongodb://localhost:27017/database', {
     .catch(err => console.log('Failed to connect to Mongodb,', err.message));
 
 
-//app.use(express.json());
+// app.use(express.json());
     
 app.use(bodyParser.urlencoded({
     extended: true
