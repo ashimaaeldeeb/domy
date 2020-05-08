@@ -14,7 +14,7 @@ const productSchema = Joi.object({
         Color: Joi.string().optional().allow('')
     }),
     ratioOfPromotion: Joi.number().optional(),
-    isPromoted: Joi.boolean().default(false),
+    // isPromoted: Joi.boolean().default(false),
     quantity: Joi.number().required(),
     isDeleted: Joi.boolean().default(false),
     // rate: Joi.number(),

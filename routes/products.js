@@ -83,7 +83,8 @@ router.get('/promoted', async (req, res) => {
     console.log("get Product promoted");
     const products = await Product.find({
         $and: [{
-            isPromoted: true
+            ratioOfPromotion: {$gt: 0}
+            // isPromoted: true
         }, {
             isDeleted: false
         }]
@@ -160,7 +161,7 @@ router.patch('/:id', upload.array('images', 5), async (req, res) => {
     productFromDB.title = product.title ? product.title : productFromDB.title;
     productFromDB.price = product.price ? product.price : productFromDB.price;
     productFromDB.ratioOfPromotion = product.ratioOfPromotion ? product.ratioOfPromotion : productFromDB.ratioOfPromotion;
-    productFromDB.isPromoted = product.isPromoted ? product.isPromoted : productFromDB.isPromoted;
+    // productFromDB.isPromoted = product.isPromoted ? product.isPromoted : productFromDB.isPromoted;
     productFromDB.quantity = product.quantity ? product.quantity : productFromDB.quantity;
     productFromDB.isDeleted = product.isDeleted ? product.isDeleted : productFromDB.isDeleted;
     if (!product.details) {
@@ -205,8 +206,8 @@ router.post('/', upload.array('images', 5), async (req, res) => {
     // })
     product.isDeleted = false;
     product.images = images;
-    if (product.ratioOfPromotion)
-        product.isPromoted = true;
+    // if (product.ratioOfPromotion)
+    //     product.isPromoted = true;
     product = await product.save();
     res.send(product);
 });

@@ -35,9 +35,9 @@ const productSchema = new mongoose.Schema({
     ratioOfPromotion: {
         type: Number
     },
-    isPromoted: {
-        type: Boolean
-    },
+    // isPromoted: {
+    //     type: Boolean
+    // },
     quantity: {
         type: Number,
         required: true

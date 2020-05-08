@@ -63,7 +63,7 @@ router.post("/", CheckToken, async (req, res) => {
     console.log("product");
     console.log(product);
     // {{item.product.price - item.product.price * item.product.ratioOfPromotion}} EGP
-    if (product.isPromoted) {
+    if (product.ratioOfPromotion>0) {
       totalPrice +=
         (product.price - product.price * product.ratioOfPromotion) *
         element.quantity;
