@@ -192,9 +192,9 @@ router.post('/', upload.array('images', 5), async (req, res) => {
     });
 
     let images = [];
-    req.files.forEach(image => {
-        images.push(`Uploads/${image.filename}`);
-    })
+    // req.files.forEach(image => {
+    //     images.push(`Uploads/${image.filename}`);
+    // })
     product.isDeleted = false;
     product.images = images;
     if (product.ratioOfPromotion)

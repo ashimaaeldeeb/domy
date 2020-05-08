@@ -12,6 +12,10 @@ const CheckToken = require('../midlware/Auth');
 
 const router = express.Router();
 
+router.get('/',async (req, res) => {
+    const users = await User.find({});
+    res.send(users);
+});
 
 //signup method 
 
