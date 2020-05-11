@@ -4,11 +4,22 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Cart = require('../models/cart');
 const Order = require('../models/order');
-const upload = require('../midlware/uploadImg');
 const validateUser = require('../helpers/ValidateUser');
 const validateObjectId = require('../helpers/ValidateObjectID');
 const validateEmail = require('../helpers/ValidateEmail');
 const CheckToken = require('../midlware/Auth');
+
+const multer = require('multer');
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './uploads/users')
+    },
+    filename: function (req, file, cb) {
+        const ext = file.originalname.split('.')[1];
+      cb(null, "user" + '-' + Date.now() + '.' + ext)
+    }
+  })
+const upload = multer({storage: storage});
 
 const router = express.Router();
 
@@ -133,7 +144,8 @@ router.post('/login', async (req, res) => {
 })
 
 //add profile image
-router.post('/upload/profile/:id', CheckToken, upload.single('image'), async (req, res) => {
+router.post('/upload/profile/:id', [CheckToken, upload.single('image')], async (req, res) => {
+    console.log("in route");
     const {
         error
     } = validateObjectId(req.params.id);
@@ -143,12 +155,17 @@ router.post('/upload/profile/:id', CheckToken, upload.single('image'), async (re
         _id: req.params.id
     });
     console.log(user);
-
     if (!user)
         return res.status(404).send("user Not found");
 
-    user.image = `Uploads/${req.file.filename}`;
-    await user.save();
+    console.log("req.file",req.file);
+    if(req.file) {
+        console.log(req.file);
+        const url = req.protocol + '://' + req.get('host');
+        user.image = url + '/' + req.file.filename;
+        await user.save();
+    }
+    else throw 'no file';
     return res.status(203).send(user);
 
 })

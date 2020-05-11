@@ -1,8 +1,20 @@
 const express = require('express');
 const Product = require('../models/product');
-const upload = require('../midlware/uploadImg');
+// const upload = require('../midlware/uploadImg');
 const validateProduct = require('../helpers/validateProduct');
 const validateObjectId = require('../helpers/validateObjectId');
+
+const multer = require('multer');
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './uploads/products')
+    },
+    filename: function (req, file, cb) {
+        const ext = file.originalname.split('.')[1];
+      cb(null, "product" + '-' + Date.now() + '.' + ext)
+    }
+  })
+const upload = multer({storage: storage});
 
 const router = express.Router();
 
@@ -174,16 +186,17 @@ router.patch('/:id', upload.array('images', 5), async (req, res) => {
         productFromDB.details.GPU = product.details.GPU ? product.details.GPU : productFromDB.details.GPU;
         productFromDB.details.Color = product.details.Color ? product.details.Color : productFromDB.details.Color;
     }
-    if (req.files) {
+    if (req.files && req.files.length) {
         let images = [];
         req.files.forEach(image => {
-            images.push(`Uploads/${image.filename}`);
+            const url = req.protocol + '://' + req.get('host');
+            images.push(`${url}/${image.filename}`);
         })
         productFromDB.images = images;
     } else {
+        console.log('no file');
         productFromDB.images = productFromDB.images;
     }
-
 
     await productFromDB.save();
     res.send(productFromDB);
@@ -192,6 +205,7 @@ router.patch('/:id', upload.array('images', 5), async (req, res) => {
 //add product
 router.post('/', upload.array('images', 5), async (req, res) => {
     console.log("add Product by id");
+    console.log(req);
     const {
         error
     } = validateProduct(req.body);
@@ -200,14 +214,25 @@ router.post('/', upload.array('images', 5), async (req, res) => {
         ...req.body
     });
 
-    let images = [];
-    // req.files.forEach(image => {
-    //     images.push(`Uploads/${image.filename}`);
-    // })
+    console.log("req.files",req.files);
+    // let images = [];
+    if(req.files && req.files.length){
+        req.files.forEach(image => {
+            const url = req.protocol + '://' + req.get('host');
+            product.images.push(`${url}/${image.filename}`);
+        })
+    }
+    else {
+        console.log('no file');
+        product.images = [];
+    }
+
     product.isDeleted = false;
-    product.images = images;
+    // product.images = images;
+
     // if (product.ratioOfPromotion)
     //     product.isPromoted = true;
+
     product = await product.save();
     res.send(product);
 });
