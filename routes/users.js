@@ -240,7 +240,26 @@ router.patch('/:id', CheckToken, async (req, res) => {
         userInDB.password = await bcrypt.hash(user.password, salt);
     }
     await userInDB.save();
-    return res.status(200).send(userInDB);
+
+    const payload = {
+        user: {
+            id: userInDB._id,
+            userName: user.userName,
+            isAdmin: user.isAdmin
+        }
+    }
+
+    jwt.sign(payload, "secret", {
+        expiresIn: 10000
+    }, (error, token) => {
+        if (error)
+            return res.statusCode(400).send("error in token creation");
+        return res.status(200).json({
+            token,
+            user
+        }).send()
+    })
+    // return res.status(200).send(userInDB);
 })
 
 module.exports = router;
