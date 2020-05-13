@@ -53,40 +53,45 @@ router.post("/", CheckToken, async (req, res) => {
     products: [],
     status: "pending"
   });
-  cart.productsList.forEach(async element => {
-    // if (!element.isDeleted) {
-    order.products.push({
-      product: element.productId,
-      quantity: element.quantity
-    });
-    const product = await Product.findById(element.productId);
-    console.log("product");
-    console.log(product);
-    // {{item.product.price - item.product.price * item.product.ratioOfPromotion}} EGP
-    if (product.ratioOfPromotion>0) {
-      totalPrice +=
-        (product.price - product.price * product.ratioOfPromotion) *
-        element.quantity;
-    } else {
-      totalPrice += product.price * element.quantity;
-    }
-    console.log("totalPrice");
-    console.log(totalPrice);
-    order.price = totalPrice;
-    console.log("order");
-    console.log(order);
+  // await cart.productsList.forEach(async element => {
+  //   // if (!element.isDeleted) {
+  //   order.products.push({
+  //     product: element.productId,
+  //     quantity: element.quantity
+  //   });
+  //   const product = await Product.findById(element.productId);
+  //   // {{item.product.price - item.product.price * item.product.ratioOfPromotion}} EGP
+  //   // if (product.ratioOfPromotion>0) {
+  //     totalPrice +=
+  //       (product.price - product.price * product.ratioOfPromotion) *
+  //       element.quantity;
+  //   // } else {
+  //     // totalPrice += product.price * element.quantity;
+  //   // }
+  //   order.price = totalPrice;
+  //   // await order.save();
+  //   console.log("order in scope",order)
+  // });
 
-    // }
-  });
-  // order.products = productsToBeOrdered;
+  for(var i=0;i<cart.productsList.length; i++){
+    order.products.push({
+      product: cart.productsList[i].productId,
+      quantity: cart.productsList[i].quantity
+    });
+    const product = await Product.findById(cart.productsList[i].productId);
+    totalPrice +=
+        (product.price - product.price * product.ratioOfPromotion) *
+        cart.productsList[i].quantity;
+    order.price = totalPrice;
+    console.log("order in scope",order)
+  }
+
+  console.log("order out scope",order)
   await order.save();
-  console.log("order2");
-  console.log(order);
   user.orders.push(order.id);
   await user.save();
-  cart.productsList = [];
-  console.log("CARRT", cart.productsList);
-  await cart.save();
+  cart.productsList = []; //TODO rgg3eeeeeeeeeeeeeeeeeeeeeeeha
+  await cart.save(); //TODO rgg3eeeeeeeeeeeeeeeeeeeeeeeha
   return res.send(order);
 });
 

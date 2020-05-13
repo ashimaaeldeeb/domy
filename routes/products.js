@@ -33,6 +33,7 @@ router.get('/', async (req, res) => {
 //search for product  
 router.post('/search', async (req, res) => {
     console.log("search Product ");
+    console.log(req.body);
     const searchparams = {
         ...req.body
     }
@@ -47,47 +48,80 @@ router.post('/search', async (req, res) => {
             if (error) {
                 return res.send(error)
             }
-            if (!result.length)
-                return res.status(404).send("Data Not Found")
+            // if (!result.length)
+            //     return res.status(404).send("Data Not Found")
+            return res.send(result)
+        })
+    }
+    else if (searchparams.Brand) {
+        await Product.find({
+            $and: [{
+                'details.Brand': new RegExp(".*" + searchparams.Brand + ".*") //TODO : case sensitive???
+            }, {
+                isDeleted: { $ne: true}
+            }]
+        }, (error, result) => {
+            if (error) {
+                return res.send(error)
+            }
+            // if (!result.length)
+            //     return res.status(404).send("Data Not Found")
+            return res.send(result)
+        })
+    }
+    else if (searchparams.Processor) {
+        await Product.find({
+            $and: [{
+                'details.Processor': new RegExp(".*" + searchparams.Processor + ".*") //TODO : case sensitive???
+            }, {
+                isDeleted: { $ne: true}
+            }]
+        }, (error, result) => {
+            if (error) {
+                return res.send(error)
+            }
+            // if (!result.length)
+            //     return res.status(404).send("Data Not Found")
             return res.send(result)
         })
     }
     else{
-        return res.status(404).send("No title found")
+        return res.status(404).send("No match found")
     }
+    return res.status(404).send("No data sent for search")
 });
 
-//   /search/Brand?Brand=Lenovo 
-//   /search/Brand?Brand=HP
-//   /search/Brand?Brand=Dell
-router.get('/search/Brand', async (req, res) => {
-    console.log("search Product brand");
-    console.log("hi2");
-    //console.log("Requset "+req.baseUrl);
-    //const queryObject = url.parse(req.url,true).search;
-    console.log(req.query.Brand);
-    //console.log(queryObject);
-    //console.log(queryObject[0]);
-    //console.log(queryObject.Brand);
-    //console.log(queryObject["Brand"]);
-    //const products = await Product.find({"title":{ $regex:req.query.title}},{"isDeleted": false});
-    const products = await Product.find({"details.Brand":req.query.Brand},{"isDeleted": false});
-    //console.log(req.originalUrl);
-    //console.log(products)
-    if (!products) return res.status(404).send('Product not found');
-    res.send(products);
-});
+// //   /search/Brand?Brand=Lenovo 
+// //   /search/Brand?Brand=HP
+// //   /search/Brand?Brand=Dell
+// router.get('/search/Brand', async (req, res) => {
+//     console.log("search Product brand");
+//     console.log("hi2");
+//     //console.log("Requset "+req.baseUrl);
+//     //const queryObject = url.parse(req.url,true).search;
+//     console.log(req.query.Brand);
+//     //console.log(queryObject);
+//     //console.log(queryObject[0]);
+//     //console.log(queryObject.Brand);
+//     //console.log(queryObject["Brand"]);
+//     //const products = await Product.find({"title":{ $regex:req.query.title}},{"isDeleted": false});
+//     const products = await Product.find({"details.Brand":req.query.Brand},{"isDeleted": false});
+//     //console.log(req.originalUrl);
+//     //console.log(products)
+//     if (!products) return res.status(404).send('Product not found');
+//     res.send(products);
+// });
 
-//   /search/Processor?Processor=Core i3 
-//   /search/Processor?Processor=Core i5
-//   /search/Processor?Processor=Core i7
-//   /search/Processor?Processor=Core i9
-router.get('/search/Processor', async (req, res) => {
-    console.log("search Product Processor");
-    const products = await Product.find({"details.Processor":req.query.Processor},{"isDeleted": false});
-    if (!products) return res.status(404).send('Product not found');
-    res.send(products);
-});
+// //   /search/Processor?Processor=Core i3 
+// //   /search/Processor?Processor=Core i5
+// //   /search/Processor?Processor=Core i7
+// //   /search/Processor?Processor=Core i9
+// router.get('/search/Processor', async (req, res) => {
+//     console.log("search Product Processor");
+//     const products = await Product.find({"details.Processor":req.query.Processor},{"isDeleted": false});
+//     if (!products) return res.status(404).send('Product not found');
+//     res.send(products);
+// });
 
 
 //get promoted products only
