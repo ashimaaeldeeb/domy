@@ -235,7 +235,8 @@ router.patch('/:id', CheckToken, async (req, res) => {
     }
     userInDB.userName = user.userName ? user.userName : userInDB.userName;
     userInDB.gender = user.gender ? user.gender : userInDB.gender;
-    if (user.password) {
+    console.log("password",user.password);
+    if (user.password && user.password != "null") {
         const salt = await bcrypt.genSalt(10);
         userInDB.password = await bcrypt.hash(user.password, salt);
     }
