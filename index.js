@@ -25,25 +25,14 @@ app.use(express.static("./uploads/products"));
 app.use(express.static("./uploads/logo"));
 app.use(express.static("./uploads/slider"));
 
-// app.use(express.json());
-
-// app.use(express.static('public'));
-
-// app.use(express.json({ limit: '50mb' }));
-// app.use(bodyParser({ limit: '50mb' }));
-// app.use(bodyParser.json({ limit: '50mb' }));
 app.use(
   bodyParser.urlencoded({
-    // limit: '50mb',
     extended: true,
-    // parameterLimit: 50000
   })
 );
 
 app.use(cors());
 app.options("*", cors());
-
-// app.use('/public', express.static('public'));
 
 app.use("/products", productRouter);
 app.use("/orders", ordersRouter);

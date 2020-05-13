@@ -10,8 +10,6 @@ const userSchema = Joi.object({
     isAdmin: Joi.boolean().default(false),
     orders: Joi.array().items(Joi.objectId()).default([]),
     cart: Joi.objectId()
-    // orders: Joi.array().items(Joi.objectId()).default([]),
-    // cart: Joi.objectId().default()
 });
 const validatUser = user => userSchema.validate(user, {
     abortEarly: false

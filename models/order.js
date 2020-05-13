@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        // required: true,
         ref: 'User'
     },
     date: {
@@ -11,7 +10,6 @@ const orderSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        // required: true
     },
     products: [{
         product: {

@@ -1,6 +1,5 @@
 const express = require('express');
 const Product = require('../models/product');
-// const upload = require('../midlware/uploadImg');
 const validateProduct = require('../helpers/validateProduct');
 const validateObjectId = require('../helpers/validateObjectId');
 
@@ -29,11 +28,8 @@ router.get('/', async (req, res) => {
     res.send(products);
 });
 
-//TODO : check which search???
 //search for product  
 router.post('/search', async (req, res) => {
-    console.log("search Product ");
-    console.log(req.body);
     const searchparams = {
         ...req.body
     }
@@ -48,8 +44,6 @@ router.post('/search', async (req, res) => {
             if (error) {
                 return res.send(error)
             }
-            // if (!result.length)
-            //     return res.status(404).send("Data Not Found")
             return res.send(result)
         })
     }
@@ -64,8 +58,6 @@ router.post('/search', async (req, res) => {
             if (error) {
                 return res.send(error)
             }
-            // if (!result.length)
-            //     return res.status(404).send("Data Not Found")
             return res.send(result)
         })
     }
@@ -80,8 +72,6 @@ router.post('/search', async (req, res) => {
             if (error) {
                 return res.send(error)
             }
-            // if (!result.length)
-            //     return res.status(404).send("Data Not Found")
             return res.send(result)
         })
     }
@@ -91,46 +81,11 @@ router.post('/search', async (req, res) => {
     return res.status(404).send("No data sent for search")
 });
 
-// //   /search/Brand?Brand=Lenovo 
-// //   /search/Brand?Brand=HP
-// //   /search/Brand?Brand=Dell
-// router.get('/search/Brand', async (req, res) => {
-//     console.log("search Product brand");
-//     console.log("hi2");
-//     //console.log("Requset "+req.baseUrl);
-//     //const queryObject = url.parse(req.url,true).search;
-//     console.log(req.query.Brand);
-//     //console.log(queryObject);
-//     //console.log(queryObject[0]);
-//     //console.log(queryObject.Brand);
-//     //console.log(queryObject["Brand"]);
-//     //const products = await Product.find({"title":{ $regex:req.query.title}},{"isDeleted": false});
-//     const products = await Product.find({"details.Brand":req.query.Brand},{"isDeleted": false});
-//     //console.log(req.originalUrl);
-//     //console.log(products)
-//     if (!products) return res.status(404).send('Product not found');
-//     res.send(products);
-// });
-
-// //   /search/Processor?Processor=Core i3 
-// //   /search/Processor?Processor=Core i5
-// //   /search/Processor?Processor=Core i7
-// //   /search/Processor?Processor=Core i9
-// router.get('/search/Processor', async (req, res) => {
-//     console.log("search Product Processor");
-//     const products = await Product.find({"details.Processor":req.query.Processor},{"isDeleted": false});
-//     if (!products) return res.status(404).send('Product not found');
-//     res.send(products);
-// });
-
-
 //get promoted products only
 router.get('/promoted', async (req, res) => {
-    console.log("get Product promoted");
     const products = await Product.find({
         $and: [{
             ratioOfPromotion: {$gt: 0}
-            // isPromoted: true
         }, {
             isDeleted: false
         }]
@@ -142,7 +97,6 @@ router.get('/promoted', async (req, res) => {
 
 //get Product
 router.get('/:id', async (req, res) => {
-    console.log("get Product by id");
     const {
         id
     } = req.params;
@@ -167,7 +121,6 @@ router.get('/:id', async (req, res) => {
 
 //delete product 
 router.delete('/:id', async (req, res) => {
-    console.log("delete Product by id");
     const {
         id
     } = req.params;
@@ -188,7 +141,6 @@ router.delete('/:id', async (req, res) => {
 
 //edit product 
 router.patch('/:id', upload.array('images', 5), async (req, res) => {
-    console.log("update Product by id");
     const {
         id
     } = req.params;
@@ -207,7 +159,6 @@ router.patch('/:id', upload.array('images', 5), async (req, res) => {
     productFromDB.title = product.title ? product.title : productFromDB.title;
     productFromDB.price = product.price ? product.price : productFromDB.price;
     productFromDB.ratioOfPromotion = product.ratioOfPromotion ? product.ratioOfPromotion : productFromDB.ratioOfPromotion;
-    // productFromDB.isPromoted = product.isPromoted ? product.isPromoted : productFromDB.isPromoted;
     productFromDB.quantity = product.quantity ? product.quantity : productFromDB.quantity;
     productFromDB.isDeleted = product.isDeleted ? product.isDeleted : productFromDB.isDeleted;
     if (!product.details) {
@@ -228,7 +179,6 @@ router.patch('/:id', upload.array('images', 5), async (req, res) => {
         })
         productFromDB.images = images;
     } else {
-        console.log('no file');
         productFromDB.images = productFromDB.images;
     }
 
@@ -238,8 +188,6 @@ router.patch('/:id', upload.array('images', 5), async (req, res) => {
 
 //add product
 router.post('/', upload.array('images', 5), async (req, res) => {
-    console.log("add Product by id");
-    console.log(req);
     const {
         error
     } = validateProduct(req.body);
@@ -248,8 +196,6 @@ router.post('/', upload.array('images', 5), async (req, res) => {
         ...req.body
     });
 
-    console.log("req.files",req.files);
-    // let images = [];
     if(req.files && req.files.length){
         req.files.forEach(image => {
             const url = req.protocol + '://' + req.get('host');
@@ -257,16 +203,10 @@ router.post('/', upload.array('images', 5), async (req, res) => {
         })
     }
     else {
-        console.log('no file');
         product.images = [];
     }
 
     product.isDeleted = false;
-    // product.images = images;
-
-    // if (product.ratioOfPromotion)
-    //     product.isPromoted = true;
-
     product = await product.save();
     res.send(product);
 });

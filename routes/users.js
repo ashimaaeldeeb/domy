@@ -115,7 +115,6 @@ router.post('/login', async (req, res) => {
         });
         if (!user)
             return res.statusCode(404).send("email not found");
-        console.log(user);
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch)
@@ -145,7 +144,6 @@ router.post('/login', async (req, res) => {
 
 //add profile image
 router.post('/upload/profile/:id', [CheckToken, upload.single('image')], async (req, res) => {
-    console.log("in route");
     const {
         error
     } = validateObjectId(req.params.id);
@@ -154,13 +152,10 @@ router.post('/upload/profile/:id', [CheckToken, upload.single('image')], async (
     const user = await User.findOne({
         _id: req.params.id
     });
-    console.log(user);
     if (!user)
         return res.status(404).send("user Not found");
 
-    console.log("req.file",req.file);
     if(req.file) {
-        console.log(req.file);
         const url = req.protocol + '://' + req.get('host');
         user.image = url + '/' + req.file.filename;
         await user.save();
@@ -235,7 +230,6 @@ router.patch('/:id', CheckToken, async (req, res) => {
     }
     userInDB.userName = user.userName ? user.userName : userInDB.userName;
     userInDB.gender = user.gender ? user.gender : userInDB.gender;
-    console.log("password",user.password);
     if (user.password && user.password != "null") {
         const salt = await bcrypt.genSalt(10);
         userInDB.password = await bcrypt.hash(user.password, salt);

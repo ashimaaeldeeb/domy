@@ -44,7 +44,6 @@ router.post("/", CheckToken, async (req, res) => {
   if (!user) return res.status(404).send("user not found");
   const cart = await Cart.findById(user.cart);
   if (!cart.productsList.length) return res.status(400).send("cart is empty");
-  // let productsToBeOrdered = [];
   var totalPrice = 0;
   let order = new Order({
     user: req.body.user,
@@ -53,25 +52,6 @@ router.post("/", CheckToken, async (req, res) => {
     products: [],
     status: "pending"
   });
-  // await cart.productsList.forEach(async element => {
-  //   // if (!element.isDeleted) {
-  //   order.products.push({
-  //     product: element.productId,
-  //     quantity: element.quantity
-  //   });
-  //   const product = await Product.findById(element.productId);
-  //   // {{item.product.price - item.product.price * item.product.ratioOfPromotion}} EGP
-  //   // if (product.ratioOfPromotion>0) {
-  //     totalPrice +=
-  //       (product.price - product.price * product.ratioOfPromotion) *
-  //       element.quantity;
-  //   // } else {
-  //     // totalPrice += product.price * element.quantity;
-  //   // }
-  //   order.price = totalPrice;
-  //   // await order.save();
-  //   console.log("order in scope",order)
-  // });
 
   for(var i=0;i<cart.productsList.length; i++){
     order.products.push({
@@ -83,10 +63,8 @@ router.post("/", CheckToken, async (req, res) => {
         (product.price - product.price * product.ratioOfPromotion) *
         cart.productsList[i].quantity;
     order.price = totalPrice;
-    console.log("order in scope",order)
   }
 
-  console.log("order out scope",order)
   await order.save();
   user.orders.push(order.id);
   await user.save();
@@ -127,27 +105,6 @@ router.patch("/:id", CheckToken, async (req, res) => {
   }
   order.save();
   return res.send(order);
-
-  //   if (
-  //     order.status === "pending" &&
-  //     (status === "accepted" || status === "rejected")
-  //   ) {
-  //     order.status = status;
-  //     order.products.forEach(async element => {
-  //       const product = await Product.findById(element.productId);
-  //       if (product.quantity < element.quantity) {
-  //         return res.status(400).send(`run out of stock product ${element}`);
-  //       }
-  //       console.log("before in patch order", product.quantity);
-
-  //       product.quantity -= element.quantity;
-  //       console.log("after in patch order",product.quantity);
-  //       if (product.quantity < 0) {
-  //         product.quantity = 0;
-  //       }
-  //       await product.save();
-  //     });
-  //   }
 });
 
 //cancel order if pending:
